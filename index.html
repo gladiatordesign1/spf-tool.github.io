@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Processor</title>
+</head>
+<body>
+
+<label for="domainInput">Enter Domains (comma-separated): </label>
+<input type="text" id="domainInput" placeholder="e.g., example.com, domain2.com">
+
+<label for="additionalText">Additional Text (one per line): </label>
+<textarea id="additionalText" placeholder="Text to add to each domain"></textarea>
+
+<button onclick="processDomains()">Process Domains</button>
+
+<p>Result:</p>
+<textarea id="result" rows="5" cols="50" readonly></textarea>
+
+<script>
+function processDomains() {
+    const domainInput = document.getElementById('domainInput').value;
+    const additionalText = document.getElementById('additionalText').value;
+    const resultTextArea = document.getElementById('result');
+
+    // Check if the input is not empty
+    if (domainInput.trim() === '' || additionalText.trim() === '') {
+        resultTextArea.value = 'Please enter domains and additional text.';
+        return;
+    }
+
+    // Split the input into an array of domains
+    const domains = domainInput.split(',').map(domain => domain.trim());
+
+    // Split the additional text into an array
+    const texts = additionalText.split('\n').map(text => text.trim());
+
+    // Process the domains with all texts
+    const processedResult = domains.map(domain => {
+        const domainWithTexts = texts.map(text => `${domain} ${text}`).join('\n');
+        return `${domainWithTexts}`;
+    }).join('\n\n');
+
+    // Display the result
+    resultTextArea.value = processedResult;
+}
+</script>
+
+</body>
+</html>
