@@ -78,14 +78,13 @@
 
     <label for="type1">Domains Or Ips:</label>
     <select id="type1" onchange="handleTypeChange()">
-           <option value="ip4:">Ips</option>
       <option value="a:">Domains</option>
- 
+      <option selected value="ip4:">Ips</option>
     </select>
 
     <label for="allType">Select all type:</label>
     <select id="allType">
-      <option value="-all">-all</option>
+      <option  value="-all">-all</option>
       <option value="~all">~all</option>
     </select>
 
@@ -124,10 +123,10 @@
           result += '\n'; // Add a line break between groups
         }
 
-        // Exclude iptype entirely when the user selects "Domains"
-        const iptypeValue = selectedType === 'a:' ? '' : iptypeSelect.value;
+        // Include iptype only when the user selects "Domains"
+        const iptypeValue = selectedType === 'a:' ? iptypeSelect.value : '';
 
-        result += `${domain}.v=spf1${domainGroup.map(domain => ` ${selectedType}${domain}${iptypeValue}`).join('')} ${allType}`;
+        result += `${domain}v=spf1${domainGroup.map(domain => ` ${selectedType}${domain}${iptypeValue}`).join('')} ${allType}`;
       }
 
       document.getElementById('result').value = result;
