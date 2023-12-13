@@ -43,16 +43,16 @@
       background-color: #5179d6;
       color: #ffffff;
       padding: 15px 80px;
-	  margin: 15px 15px;
+      margin: 15px 15px;
       border: none;
-	  transition: 350ms ease-in-out;
+      transition: 350ms ease-in-out;
       border-radius: 4px;
       cursor: pointer;
     }
 
     #create-button:hover {
       background-color: #45a049;
-	  transition: 350ms ease-in-out;
+      transition: 350ms ease-in-out;
     }
 
     #result {
@@ -76,10 +76,11 @@
     <label for="groupSize">Enter number to divide domains: </label>
     <input type="number" id="groupSize" min="1" value="10">
 
-  <label for="type1">Domains Or Ips:</label>
-    <select id="type1">
+    <label for="type1">Domains Or Ips:</label>
+    <select id="type1" onchange="handleTypeChange()">
+           <option value="ip4:">Ips</option>
       <option value="a:">Domains</option>
-      <option value="ip4:">Ips</option>
+ 
     </select>
 
     <label for="allType">Select all type:</label>
@@ -88,14 +89,12 @@
       <option value="~all">~all</option>
     </select>
 
-
-  <label for="iptype">Select /X:</label>
+    <label for="iptype">Select /X:</label>
     <select id="iptype">
       <option value="/16">/16</option>
       <option value="/24">/24</option>
-      <option value="/24">/28</option>
+      <option value="/28">/28</option>
     </select>
-
 
     <button id="create-button" onclick="processDomains()">Create</button>
 
@@ -109,8 +108,9 @@
       const domain = document.getElementById('domain').value;
       const groupSize = parseInt(document.getElementById('groupSize').value, 10);
       const allType = document.getElementById('allType').value;
-      const iptype = document.getElementById('iptype').value;
-        const type1 = document.getElementById('type1').value;
+      const iptypeSelect = document.getElementById('iptype');
+      const type1Select = document.getElementById('type1');
+      const selectedType = type1Select.value;
       let result = '';
 
       for (let i = 0; i < inputDomains.length; i += groupSize) {
@@ -124,10 +124,24 @@
           result += '\n'; // Add a line break between groups
         }
 
-        result += `${domain}.v=spf1${domainGroup.map(domain => ` ${type1}${domain}${iptype}`).join('')} ${allType}`;
+        // Exclude iptype entirely when the user selects "Domains"
+        const iptypeValue = selectedType === 'a:' ? '' : iptypeSelect.value;
+
+        result += `${domain}.v=spf1${domainGroup.map(domain => ` ${selectedType}${domain}${iptypeValue}`).join('')} ${allType}`;
       }
 
       document.getElementById('result').value = result;
+
+      // Hide or show "Select /X:" based on the user's selection
+      if (selectedType === 'a:') {
+        iptypeSelect.style.display = 'block'; // Show
+      } else {
+        iptypeSelect.style.display = 'none'; // Hide
+      }
+    }
+
+    function handleTypeChange() {
+      processDomains(); // Call the processDomains function when the type changes
     }
   </script>
 </body>
