@@ -1,51 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domain Processor</title>
-</head>
-<body>
-
-<label for="domainInput">Enter Domains (comma-separated): </label>
-<input type="text" id="domainInput" placeholder="e.g., example.com, domain2.com">
-
-<label for="additionalText">Additional Text (one per line): </label>
-<textarea id="additionalText" placeholder="Text to add to each domain"></textarea>
-
-<button onclick="processDomains()">Process Domains</button>
-
-<p>Result:</p>
-<textarea id="result" rows="5" cols="50" readonly></textarea>
-
-<script>
-function processDomains() {
-    const domainInput = document.getElementById('domainInput').value;
-    const additionalText = document.getElementById('additionalText').value;
-    const resultTextArea = document.getElementById('result');
-
-    // Check if the input is not empty
-    if (domainInput.trim() === '' || additionalText.trim() === '') {
-        resultTextArea.value = 'Please enter domains and additional text.';
-        return;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domain Processor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
     }
 
-    // Split the input into an array of domains
-    const domains = domainInput.split(',').map(domain => domain.trim());
+    #form-container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-    // Split the additional text into an array
-    const texts = additionalText.split('\n').map(text => text.trim());
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
 
-    // Process the domains with all texts
-    const processedResult = domains.map(domain => {
-        const domainWithTexts = texts.map(text => `${domain} ${text}`).join('\n');
-        return `${domainWithTexts}`;
-    }).join('\n\n');
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
 
-    // Display the result
-    resultTextArea.value = processedResult;
-}
-</script>
+    #create-button {
+      background-color: #5179d6;
+      color: #ffffff;
+      padding: 15px 80px;
+	  margin: 15px 15px;
+      border: none;
+	  transition: 350ms ease-in-out;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
+    #create-button:hover {
+      background-color: #45a049;
+	  transition: 350ms ease-in-out;
+    }
+
+    #result {
+      width: 100%;
+      height: 200px;
+      resize: none;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="form-container">
+    <label for="domains">Enter domains (one per line): </label>
+    <textarea id="domains" rows="4" placeholder="example.com"></textarea>
+
+    <label for="domain">Enter SPF Domain: </label>
+    <input type="text" id="domain" placeholder="appelinguage.us.com..">
+
+    <label for="groupSize">Enter number to divide domains: </label>
+    <input type="number" id="groupSize" min="1" value="10">
+
+  <label for="type1">Domains Or Ips:</label>
+    <select id="type1">
+      <option value="a:">Domains</option>
+      <option value="ip4:">Ips</option>
+    </select>
+
+    <label for="allType">Select all type:</label>
+    <select id="allType">
+      <option value="-all">-all</option>
+      <option value="~all">~all</option>
+    </select>
+
+
+  <label for="iptype">Select /X:</label>
+    <select id="iptype">
+      <option value="/16">/16</option>
+      <option value="/24">/24</option>
+      <option value="/24">/28</option>
+    </select>
+
+
+    <button id="create-button" onclick="processDomains()">Create</button>
+
+    <label for="result">Result:</label>
+    <textarea id="result" readonly></textarea>
+  </div>
+
+  <script>
+    function processDomains() {
+      const inputDomains = document.getElementById('domains').value.split('\n').map(domain => domain.trim());
+      const domain = document.getElementById('domain').value;
+      const groupSize = parseInt(document.getElementById('groupSize').value, 10);
+      const allType = document.getElementById('allType').value;
+      const iptype = document.getElementById('iptype').value;
+        const type1 = document.getElementById('type1').value;
+      let result = '';
+
+      for (let i = 0; i < inputDomains.length; i += groupSize) {
+        const domainGroup = inputDomains.slice(i, i + groupSize);
+
+        if (domainGroup.length === 0) {
+          continue; // Skip empty groups
+        }
+
+        if (i > 0) {
+          result += '\n'; // Add a line break between groups
+        }
+
+        result += `${domain}.v=spf1${domainGroup.map(domain => ` ${type1}${domain}${iptype}`).join('')} ${allType}`;
+      }
+
+      document.getElementById('result').value = result;
+    }
+  </script>
 </body>
 </html>
